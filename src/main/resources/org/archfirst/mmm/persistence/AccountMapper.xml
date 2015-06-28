@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.archfirst.mmm.persistence.AccountMapper">
+
+    <insert id="createAccount" parameterType="Account" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO accounts (name)
+        VALUES      (#{name})
+    </insert>
+
+    <update id="updateAccount" parameterType="Account">
+        UPDATE accounts
+        SET    name = #{name}
+        WHERE  id = #{id}
+    </update>
+
+    <select id="getAccount" resultType="Account">
+        SELECT   a.id       AS id,
+                 a.name     AS name
+        FROM     accounts a
+        WHERE    a.id = #{id}
+    </select>
+    
+    <select id="getAccounts" resultType="Account">
+        SELECT   a.id       AS id,
+                 a.name     AS name
+        FROM     accounts a
+    </select>
+
+    <delete id="deleteAccount">
+        DELETE FROM accounts
+        WHERE       id = #{id}
+    </delete>
+
+</mapper>

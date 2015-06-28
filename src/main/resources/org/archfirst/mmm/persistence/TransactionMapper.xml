@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.archfirst.mmm.persistence.TransactionMapper">
+
+    <resultMap id="resultTransaction" type="Transaction">
+        <id property="id" column="id" />
+        <result property="txn_date" column="txn_date"/>
+        <result property="payee" column="payee"/>
+        <result property="memo" column="memo"/>
+        <result property="amount" column="amount"/>
+        <association property="account" column="account_id" javaType="Account">
+            <id property="id" column="account_id"/>
+            <result property="name" column="account_name"/>
+        </association>
+        <association property="category" column="category_id" javaType="Category">
+            <id property="id" column="category_id"/>
+            <result property="name" column="category_name"/>
+        </association>
+    </resultMap>
+    
+    <insert id="createTransaction" parameterType="Transaction" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO transactions (txn_date, payee, memo, amount, account_id, category_id)
+        VALUES      (#{txn_date}, #{payee}, #{memo}, #{amount}, #{account.id}, #{category.id})
+    </insert>
+
+    <update id="updateTransaction" parameterType="Transaction">
+        UPDATE transactions
+        SET    txn_date = #{txn_date},
+               payee = #{payee},
+               memo = #{memo},
+               amount = #{amount},
+               account_id = #{account.id},
+               category_id = #{category.id}
+        WHERE  id = #{id}
+    </update>
+
+    <select id="getTransaction" resultMap="resultTransaction">
+        SELECT   t.id        AS id,
+                 t.txn_date  AS txn_date,
+                 t.payee     AS payee,
+                 t.memo      AS memo,
+                 t.amount    AS amount,
+                 a.id        AS account_id,
+                 a.name      AS account_name,
+                 c.id        AS category_id,
+                 c.name      AS category_name
+        FROM     transactions t
+                 LEFT OUTER JOIN accounts a
+                              ON t.account_id = a.id
+                 LEFT OUTER JOIN categories c
+                              ON t.category_id = c.id
+        WHERE    t.id = #{id}
+    </select>
+    
+    <select id="getTransactions" resultMap="resultTransaction">
+        SELECT   t.id        AS id,
+                 t.txn_date  AS txn_date,
+                 t.payee     AS payee,
+                 t.memo      AS memo,
+                 t.amount    AS amount,
+                 a.id        AS account_id,
+                 a.name      AS account_name,
+                 c.id        AS category_id,
+                 c.name      AS category_name
+        FROM     transactions t
+                 LEFT OUTER JOIN accounts a
+                              ON t.account_id = a.id
+                 LEFT OUTER JOIN categories c
+                              ON t.category_id = c.id
+        WHERE    a.id = #{accountId}
+    </select>
+
+    <select id="getTransactionsByCategory" resultType="TransactionSummaryForCategory">
+        SELECT   c.id              AS cat_id,
+                 c.name            AS cat_name,
+                 SUM(t.amount)     AS amount
+        FROM     transactions t
+                 LEFT OUTER JOIN categories c
+                              ON t.category_id = c.id
+        WHERE  t.txn_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY c.id
+    </select>
+
+    <delete id="deleteTransaction">
+        DELETE FROM transactions
+        WHERE       id = #{id}
+    </delete>
+
+</mapper>

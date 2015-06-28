@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.archfirst.mmm.persistence.CategoryMapper">
+
+    <insert id="createCategory" parameterType="Category" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO categories (name)
+        VALUES      (#{name})
+    </insert>
+
+    <update id="updateCategory" parameterType="Category">
+        UPDATE categories
+        SET    name = #{name}
+        WHERE  id = #{id}
+    </update>
+
+    <select id="getCategory" resultType="Category">
+        SELECT   c.id       AS id,
+                 c.name     AS name
+        FROM     categories c
+        WHERE    c.id = #{id}
+    </select>
+
+    <select id="getCategories" resultType="Category">
+        SELECT   c.id       AS id,
+                 c.name     AS name
+        FROM     categories c
+    </select>
+
+    <delete id="deleteCategory">
+        DELETE FROM categories
+        WHERE       id = #{id}
+    </delete>
+
+</mapper>
